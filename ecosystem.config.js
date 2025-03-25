@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: 'moodzie-api',
-      script: './src/main.ts',
+      script: 'dist/main.js',
       log_date_format: 'YYYY-MM-DD HH:mm Z',
       env: {
         NODE_ENV: 'development',
