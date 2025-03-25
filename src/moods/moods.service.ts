@@ -277,4 +277,170 @@ export class MoodsService {
       );
     }
   }
+
+  /**
+   * Seeds the database with predefined moods:
+   * - Default moods: rad, good, meh, bad, awful
+   * - Reward type moods (5 moods)
+   * - Purchase type moods (5 moods)
+   *
+   * @returns Summary of the seed operation
+   */
+  async seedMoods() {
+    // Define the moods data with required properties: name, emoji, colour, darkColour, type
+    const defaultMoods = [
+      {
+        name: 'Rad',
+        emoji: '🤩',
+        colour: '#FFD700',
+        darkColour: '#B8860B',
+        type: MoodType.DEFAULT,
+      },
+      {
+        name: 'Good',
+        emoji: '😁',
+        colour: '#98FB98',
+        darkColour: '#3CB371',
+        type: MoodType.DEFAULT,
+      },
+      {
+        name: 'Meh',
+        emoji: '😐',
+        colour: '#F5F5DC',
+        darkColour: '#BDB76B',
+        type: MoodType.DEFAULT,
+      },
+      {
+        name: 'Bad',
+        emoji: '😔',
+        colour: '#ADD8E6',
+        darkColour: '#4682B4',
+        type: MoodType.DEFAULT,
+      },
+      {
+        name: 'Awful',
+        emoji: '😩',
+        colour: '#FFA07A',
+        darkColour: '#CD5C5C',
+        type: MoodType.DEFAULT,
+      },
+    ];
+
+    const rewardMoods = [
+      {
+        name: 'Happy',
+        emoji: '😊',
+        colour: '#FFC0CB',
+        darkColour: '#DB7093',
+        type: MoodType.REWARD,
+      },
+      {
+        name: 'Excited',
+        emoji: '🤩',
+        colour: '#FF69B4',
+        darkColour: '#C71585',
+        type: MoodType.REWARD,
+      },
+      {
+        name: 'Proud',
+        emoji: '🥲',
+        colour: '#D8BFD8',
+        darkColour: '#9370DB',
+        type: MoodType.REWARD,
+      },
+      {
+        name: 'Relaxed',
+        emoji: '😌',
+        colour: '#E0FFFF',
+        darkColour: '#5F9EA0',
+        type: MoodType.REWARD,
+      },
+      {
+        name: 'Grateful',
+        emoji: '🙏',
+        colour: '#F0E68C',
+        darkColour: '#DAA520',
+        type: MoodType.REWARD,
+      },
+    ];
+
+    const purchaseMoods = [
+      {
+        name: 'Energetic',
+        emoji: '⚡',
+        colour: '#FFFF00',
+        darkColour: '#FFD700',
+        type: MoodType.PURCHASE,
+      },
+      {
+        name: 'Confident',
+        emoji: '💪',
+        colour: '#FF7F50',
+        darkColour: '#DC143C',
+        type: MoodType.PURCHASE,
+      },
+      {
+        name: 'Creative',
+        emoji: '🎨',
+        colour: '#FF00FF',
+        darkColour: '#8B008B',
+        type: MoodType.PURCHASE,
+      },
+      {
+        name: 'Focused',
+        emoji: '🧠',
+        colour: '#00FFFF',
+        darkColour: '#008B8B',
+        type: MoodType.PURCHASE,
+      },
+      {
+        name: 'Calm',
+        emoji: '🧘',
+        colour: '#00FF7F',
+        darkColour: '#2E8B57',
+        type: MoodType.PURCHASE,
+      },
+    ];
+
+    const allMoods = [...defaultMoods, ...rewardMoods, ...purchaseMoods];
+
+    const results = {
+      created: [],
+      skipped: [],
+    };
+
+    // Process each mood
+    for (const moodData of allMoods) {
+      // Check if the mood already exists by name and type
+      const existingMood = await this.moodRepository.findOne({
+        where: {
+          name: moodData.name,
+          type: moodData.type,
+        },
+      });
+
+      if (!existingMood) {
+        // Create the mood if it doesn't exist
+        const newMood = this.moodRepository.create({
+          ...moodData,
+          isActive: true,
+        });
+        await this.moodRepository.save(newMood);
+        results.created.push(moodData.name);
+      } else {
+        // Skip if mood already exists
+        results.skipped.push(moodData.name);
+      }
+    }
+
+    return {
+      message: 'Mood seeding operation completed successfully',
+      createdMoods: results.created.length,
+      skippedMoods: results.skipped.length,
+      details: {
+        created: results.created,
+        skipped: results.skipped,
+      },
+    };
+  }
 }

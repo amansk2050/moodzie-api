@@ -343,4 +343,370 @@ export class ActivitiesService {
       );
     }
   }
+
+  /**
+   * Seed database with predefined activity categories and subcategories
+   *
+   * @param overwriteExisting - Whether to delete existing data before seeding
+   * @returns Results of the seeding operation
+   */
+  async seedPredefinedActivities(overwriteExisting = false): Promise<any> {
+    try {
+      // If overwriteExisting is true, clear existing data
+      if (overwriteExisting) {
+        this.logger.log(
+          'Deleting existing activity categories and subcategories',
+        );
+        await this.activityCategoryRepository.delete({});
+        // Sub-categories will be deleted automatically due to CASCADE
+      }
+
+      // Predefined categories
+      const categoriesData = [
+        {
+          name: 'Emotions',
+          emoji: '😊',
+          description: 'Track your emotional states',
+          color: '#FF5733',
+          darkColor: '#CC4000',
+          subCategories: [
+            {
+              name: 'Happy',
+              emoji: '😊',
+              description: 'Feeling joyful and content',
+              color: '#FFD700',
+              darkColor: '#B8860B',
+            },
+            {
+              name: 'Sad',
+              emoji: '😢',
+              description: 'Feeling down or blue',
+              color: '#4169E1',
+              darkColor: '#00008B',
+            },
+            {
+              name: 'Angry',
+              emoji: '😠',
+              description: 'Feeling frustrated or upset',
+              color: '#FF0000',
+              darkColor: '#8B0000',
+            },
+            {
+              name: 'Anxious',
+              emoji: '😰',
+              description: 'Feeling worried or nervous',
+              color: '#FF7F50',
+              darkColor: '#A0522D',
+            },
+            {
+              name: 'Calm',
+              emoji: '😌',
+              description: 'Feeling peaceful and relaxed',
+              color: '#90EE90',
+              darkColor: '#006400',
+            },
+            {
+              name: 'Tired',
+              emoji: '😴',
+              description: 'Feeling exhausted or sleepy',
+              color: '#8A2BE2',
+              darkColor: '#4B0082',
+            },
+          ],
+        },
+        {
+          name: 'Health',
+          emoji: '❤️',
+          description: 'Track your health activities',
+          color: '#32CD32',
+          darkColor: '#006400',
+          subCategories: [
+            {
+              name: 'Exercise',
+              emoji: '🏃',
+              description: 'Physical activities and workouts',
+              color: '#FF4500',
+              darkColor: '#8B0000',
+            },
+            {
+              name: 'Medication',
+              emoji: '💊',
+              description: 'Medication intake tracking',
+              color: '#1E90FF',
+              darkColor: '#00008B',
+            },
+            {
+              name: 'Symptoms',
+              emoji: '🤒',
+              description: 'Track physical symptoms',
+              color: '#FF69B4',
+              darkColor: '#8B008B',
+            },
+            {
+              name: 'Doctor Visit',
+              emoji: '👨‍⚕️',
+              description: 'Medical appointments',
+              color: '#FFFFFF',
+              darkColor: '#A9A9A9',
+            },
+            {
+              name: 'Water',
+              emoji: '💧',
+              description: 'Water intake tracking',
+              color: '#00BFFF',
+              darkColor: '#0000CD',
+            },
+            {
+              name: 'Vitamins',
+              emoji: '💉',
+              description: 'Vitamin and supplement intake',
+              color: '#FF8C00',
+              darkColor: '#8B4513',
+            },
+          ],
+        },
+        {
+          name: 'Food',
+          emoji: '🍔',
+          description: 'Track your food and nutrition',
+          color: '#FFA500',
+          darkColor: '#8B4513',
+          subCategories: [
+            {
+              name: 'Breakfast',
+              emoji: '🍳',
+              description: 'Morning meals',
+              color: '#FFFF00',
+              darkColor: '#BDB76B',
+            },
+            {
+              name: 'Lunch',
+              emoji: '🥗',
+              description: 'Midday meals',
+              color: '#7CFC00',
+              darkColor: '#006400',
+            },
+            {
+              name: 'Dinner',
+              emoji: '🍝',
+              description: 'Evening meals',
+              color: '#FF1493',
+              darkColor: '#8B0000',
+            },
+            {
+              name: 'Snack',
+              emoji: '🍿',
+              description: 'Between-meal eating',
+              color: '#D2691E',
+              darkColor: '#8B4513',
+            },
+            {
+              name: 'Dessert',
+              emoji: '🍰',
+              description: 'Sweet treats',
+              color: '#FF00FF',
+              darkColor: '#8B008B',
+            },
+            {
+              name: 'Drinks',
+              emoji: '🥤',
+              description: 'Beverages consumed',
+              color: '#00FFFF',
+              darkColor: '#008B8B',
+            },
+          ],
+        },
+        {
+          name: 'Sleep',
+          emoji: '😴',
+          description: 'Track your sleep patterns',
+          color: '#9370DB',
+          darkColor: '#483D8B',
+          subCategories: [
+            {
+              name: 'Bedtime',
+              emoji: '🛌',
+              description: 'When you go to bed',
+              color: '#191970',
+              darkColor: '#000080',
+            },
+            {
+              name: 'Wake Up',
+              emoji: '⏰',
+              description: 'When you wake up',
+              color: '#FFD700',
+              darkColor: '#B8860B',
+            },
+            {
+              name: 'Nap',
+              emoji: '💤',
+              description: 'Short sleep during the day',
+              color: '#E6E6FA',
+              darkColor: '#6A5ACD',
+            },
+            {
+              name: 'Sleep Quality',
+              emoji: '📊',
+              description: 'How well you slept',
+              color: '#20B2AA',
+              darkColor: '#2F4F4F',
+            },
+            {
+              name: 'Dream',
+              emoji: '🌙',
+              description: 'Dream journal entries',
+              color: '#9932CC',
+              darkColor: '#4B0082',
+            },
+            {
+              name: 'Insomnia',
+              emoji: '👁️',
+              description: 'Trouble sleeping',
+              color: '#FF6347',
+              darkColor: '#8B0000',
+            },
+          ],
+        },
+        {
+          name: 'Productivity',
+          emoji: '📝',
+          description: 'Track your work and productivity',
+          color: '#4682B4',
+          darkColor: '#00008B',
+          subCategories: [
+            {
+              name: 'Work',
+              emoji: '💼',
+              description: 'Professional tasks',
+              color: '#708090',
+              darkColor: '#2F4F4F',
+            },
+            {
+              name: 'Study',
+              emoji: '📚',
+              description: 'Learning activities',
+              color: '#FF7F50',
+              darkColor: '#A0522D',
+            },
+            {
+              name: 'Hobbies',
+              emoji: '🎨',
+              description: 'Personal interest activities',
+              color: '#7B68EE',
+              darkColor: '#483D8B',
+            },
+            {
+              name: 'Meeting',
+              emoji: '👥',
+              description: 'Group discussions',
+              color: '#F0E68C',
+              darkColor: '#BDB76B',
+            },
+            {
+              name: 'Project',
+              emoji: '🏗️',
+              description: 'Personal or work projects',
+              color: '#00FA9A',
+              darkColor: '#2E8B57',
+            },
+            {
+              name: 'Breaks',
+              emoji: '☕',
+              description: 'Rest periods',
+              color: '#CD853F',
+              darkColor: '#8B4513',
+            },
+          ],
+        },
+        {
+          name: 'Weather',
+          emoji: '🌤️',
+          description: 'Track weather conditions',
+          color: '#87CEEB',
+          darkColor: '#4682B4',
+          subCategories: [
+            {
+              name: 'Sunny',
+              emoji: '☀️',
+              description: 'Clear sunny day',
+              color: '#FFFF00',
+              darkColor: '#B8860B',
+            },
+            {
+              name: 'Rainy',
+              emoji: '🌧️',
+              description: 'Precipitation and rain',
+              color: '#1E90FF',
+              darkColor: '#00008B',
+            },
+            {
+              name: 'Cloudy',
+              emoji: '☁️',
+              description: 'Overcast conditions',
+              color: '#C0C0C0',
+              darkColor: '#696969',
+            },
+            {
+              name: 'Stormy',
+              emoji: '⛈️',
+              description: 'Thunderstorms',
+              color: '#4B0082',
+              darkColor: '#191970',
+            },
+            {
+              name: 'Snowy',
+              emoji: '❄️',
+              description: 'Snow and winter conditions',
+              color: '#FFFFFF',
+              darkColor: '#A9A9A9',
+            },
+            {
+              name: 'Hot',
+              emoji: '🔥',
+              description: 'High-temperature days',
+              color: '#FF4500',
+              darkColor: '#8B0000',
+            },
+          ],
+        },
+      ];
+
+      const results = {
+        categories: [],
+        subCategories: [],
+      };
+
+      // Create each category and its sub-categories
+      for (const categoryData of categoriesData) {
+        const { subCategories, ...categoryDetails } = categoryData;
+
+        // Create the category
+        const category = await this.createActivityCategory(categoryDetails);
+        results.categories.push(category);
+
+        // Create associated subcategories
+        for (const subCategoryData of subCategories) {
+          const subCategory = await this.createActivitySubCategory({
+            ...subCategoryData,
+            categoryId: category.id,
+          });
+          results.subCategories.push(subCategory);
+        }
+      }
+
+      return {
+        message: 'Activities seeded successfully',
+        categories: results.categories.length,
+        subCategories: results.subCategories.length,
+      };
+    } catch (error) {
+      this.logger.error(
+        `Failed to seed activities: ${error.message}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException(
+        'Failed to seed predefined activities',
+      );
+    }
+  }
 }

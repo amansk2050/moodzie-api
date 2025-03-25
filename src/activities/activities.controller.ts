@@ -11,6 +11,7 @@ import {
   Logger,
   BadRequestException,
   InternalServerErrorException,
+  HttpCode,
 } from '@nestjs/common';
 import { ActivitiesService } from './activities.service';
 import { CreateActivityCategoryDto } from './dto/create-activity-category.dto';
@@ -423,6 +424,48 @@ export class ActivitiesController {
         error.stack,
       );
       throw error;
+    }
+  }
+
+  /**
+   * Seed the database with predefined activity categories and subcategories
+   * This endpoint is unauthenticated and unauthorized for initialization purposes
+   *
+   * @param overwriteExisting - Optional flag to delete existing data before seeding
+   * @returns Summary of the seeding operation
+   */
+  @ApiOperation({
+    summary: 'Seed predefined activity categories and subcategories',
+  })
+  @ApiQuery({
+    name: 'overwriteExisting',
+    required: false,
+    type: Boolean,
+    description: 'Whether to delete existing data before seeding',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'The activities have been successfully seeded',
+  })
+  @HttpCode(HttpStatus.OK)
+  @Post('seed')
+  async seedPredefinedActivities(
+    @Query('overwriteExisting') overwriteExisting?: string,
+  ) {
+    try {
+      this.logger.log(
+        'Seeding predefined activity categories and subcategories',
+      );
+      const overwrite = overwriteExisting === 'true';
+      return await this.activitiesService.seedPredefinedActivities(overwrite);
+    } catch (error) {
+      this.logger.error(
+        `Error seeding activities: ${error.message}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException(
+        'An error occurred while seeding activities',
+      );
     }
   }
 }

@@ -378,4 +378,26 @@ export class MoodsController {
       );
     }
   }
+
+  @ApiOperation({ summary: 'Seed the database with predefined moods' })
+  @ApiResponse({ status: 201, description: 'Moods successfully seeded' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Insufficient permissions',
+  })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @Roles(UserRoles.NORMAL)
+  @Post('seed')
+  async seedMoods() {
+    try {
+      this.logger.log('Seeding database with predefined moods');
+      return await this.moodsService.seedMoods();
+    } catch (error) {
+      this.logger.error(`Error seeding moods: ${error.message}`, error.stack);
+      throw new InternalServerErrorException(
+        'An error occurred while seeding moods',
+      );
+    }
+  }
 }
