@@ -345,6 +345,63 @@ export class ActivitiesService {
   }
 
   /**
+   * Get all activity categories with their subcategories
+   *
+   * @param filters - Optional filters to apply (isActive)
+   * @returns A list of categories with nested subcategories
+   */
+  async findAllCategoriesWithSubcategories(filters?: { isActive?: boolean }) {
+    try {
+      // First, get all categories
+      const whereClauseCategory: FindOptionsWhere<ActivityCategory> = {};
+
+      if (filters?.isActive !== undefined) {
+        whereClauseCategory.isActive = filters.isActive;
+      }
+
+      const categories = await this.activityCategoryRepository.find({
+        where: whereClauseCategory,
+        order: { createdAt: 'DESC' },
+      });
+
+      // For each category, get its subcategories
+      const result = await Promise.all(
+        categories.map(async (category) => {
+          const whereClauseSubCategory: FindOptionsWhere<ActivitySubCategory> =
+            {
+              categoryId: category.id,
+            };
+
+          if (filters?.isActive !== undefined) {
+            whereClauseSubCategory.isActive = filters.isActive;
+          }
+
+          const subCategories = await this.activitySubCategoryRepository.find({
+            where: whereClauseSubCategory,
+            order: { createdAt: 'DESC' },
+          });
+
+          // Return category with its subcategories
+          return {
+            ...category,
+            subCategories,
+          };
+        }),
+      );
+
+      return result;
+    } catch (error) {
+      this.logger.error(
+        `Failed to fetch categories with subcategories: ${error.message}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException(
+        'Failed to fetch categories with subcategories',
+      );
+    }
+  }
+
+  /**
    * Seed database with predefined activity categories and subcategories
    *
    * @param overwriteExisting - Whether to delete existing data before seeding

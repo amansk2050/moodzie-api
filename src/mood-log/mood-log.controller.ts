@@ -60,7 +60,7 @@ export class MoodLogController {
   ) {
     try {
       this.logger.log(`Creating mood log for user ${user.id}`);
-      return await this.moodLogService.createMoodLog(user.id, createMoodLogDto);
+      return await this.moodLogService.createMoodLog(user, createMoodLogDto);
     } catch (error) {
       this.logger.error(
         `Error creating mood log: ${error.message}`,

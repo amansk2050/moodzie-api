@@ -63,12 +63,13 @@ export class MoodLogService {
    * @returns The created mood log with relationships
    */
   async createMoodLog(
-    userId: string,
+    user,
     createMoodLogDto: CreateMoodLogDto,
   ): Promise<MoodLog> {
+    const userId = user.id;
     // Verify the userMood belongs to the user
     const userMood = await this.userMoodsRepository.findOne({
-      where: { id: createMoodLogDto.userMoodId, userId },
+      where: { moodId: createMoodLogDto.userMoodId, userId },
     });
 
     if (!userMood) {
@@ -77,54 +78,33 @@ export class MoodLogService {
       );
     }
 
-    // Handle categories and subcategories
-    let categories = [];
-    let subCategories = [];
-
-    if (
-      createMoodLogDto.categoryIds &&
-      createMoodLogDto.categoryIds.length > 0
-    ) {
-      categories = await this.activityCategoryRepository.findBy({
-        id: In(createMoodLogDto.categoryIds),
-        isActive: true,
-      });
-
-      if (categories.length !== createMoodLogDto.categoryIds.length) {
-        throw new BadRequestException(
-          'One or more activity categories not found or inactive',
-        );
-      }
-    }
-
-    if (
-      createMoodLogDto.subCategoryIds &&
-      createMoodLogDto.subCategoryIds.length > 0
-    ) {
-      subCategories = await this.activitySubCategoryRepository.findBy({
-        id: In(createMoodLogDto.subCategoryIds),
-        isActive: true,
-      });
-
-      if (subCategories.length !== createMoodLogDto.subCategoryIds.length) {
-        throw new BadRequestException(
-          'One or more activity sub-categories not found or inactive',
-        );
-      }
-    }
+    // Handle categories and subcategories later
 
     // Create the mood log
     const moodLog = this.moodLogRepository.create({
       userId,
-      userMoodId: createMoodLogDto.userMoodId,
+      userMoodId: userMood.id,
       notes: createMoodLogDto.notes,
       moodDate: createMoodLogDto.moodDate
         ? new Date(createMoodLogDto.moodDate)
         : new Date(),
       isPublic: createMoodLogDto.isPublic ?? false,
-      categories,
-      subCategories,
     });
+
+    // Handle categories and subcategories if provided
+    if (createMoodLogDto.categoryIds?.length) {
+      const categories = await this.activityCategoryRepository.findBy({
+        id: In(createMoodLogDto.categoryIds),
+      });
+      moodLog.categories = categories;
+    }
+
+    if (createMoodLogDto.subCategoryIds?.length) {
+      const subCategories = await this.activitySubCategoryRepository.findBy({
+        id: In(createMoodLogDto.subCategoryIds),
+      });
+      moodLog.subCategories = subCategories;
+    }
 
     // Save the mood log
     const savedMoodLog = await this.moodLogRepository.save(moodLog);

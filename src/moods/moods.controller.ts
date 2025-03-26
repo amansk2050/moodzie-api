@@ -243,8 +243,9 @@ export class MoodsController {
   @ApiResponse({ status: 404, description: 'No default moods found' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
   @Post('user-moods/assign-defaults')
-  async assignDefaultMoods(@GetUser('id') userId: string) {
+  async assignDefaultMoods(@GetUser() user: User) {
     try {
+      const userId = user.id;
       this.logger.log(`Assigning default moods to user ${userId}`);
       return await this.moodsService.assignDefaultMoodsToUser(userId);
     } catch (error) {

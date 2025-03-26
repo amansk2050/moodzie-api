@@ -428,6 +428,48 @@ export class ActivitiesController {
   }
 
   /**
+   * Get all activity categories with their subcategories
+   *
+   * @param isActive - Optional filter by active status
+   * @returns List of all activity categories with nested subcategories
+   */
+  @ApiOperation({
+    summary: 'Get all activity categories with their subcategories',
+  })
+  @ApiQuery({
+    name: 'isActive',
+    required: false,
+    type: Boolean,
+    description: 'Filter categories and subcategories by active status',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description:
+      'All categories with their subcategories have been successfully retrieved',
+  })
+  @Get('categories-with-subcategories')
+  async findAllCategoriesWithSubcategories(
+    @Query('isActive') isActive?: string,
+  ) {
+    try {
+      this.logger.log('Fetching all activity categories with subcategories');
+      const isActiveBoolean = isActive ? isActive === 'true' : undefined;
+
+      return await this.activitiesService.findAllCategoriesWithSubcategories({
+        isActive: isActiveBoolean,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Error fetching categories with subcategories: ${error.message}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException(
+        'An error occurred while fetching categories with subcategories',
+      );
+    }
+  }
+
+  /**
    * Seed the database with predefined activity categories and subcategories
    * This endpoint is unauthenticated and unauthorized for initialization purposes
    *
