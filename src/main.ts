@@ -17,7 +17,6 @@ async function bootstrap() {
   app.setGlobalPrefix('/api/v1');
   app.enableCors({
     origin: '*',
-    credentials: true,
   });
   app.use(cookieParser());
   app.use(compression());
